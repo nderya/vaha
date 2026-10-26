@@ -8,7 +8,7 @@
     -->
 
     <!-- Telefonun ana ekranında görünen uygulama adı. -->
-    <string name="app_name">Hava</string>
+    <string name="app_name">Vaha</string>
 
     <!-- Şehir listesi ekranı -->
     <string name="search_hint">Şehir ara</string>

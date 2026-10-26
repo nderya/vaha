@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
-// Kod bicimi tek standartta tutulur: ./gradlew spotlessApply
 spotless {
     val ktlintVersion = libs.versions.ktlint.get()
     kotlin {

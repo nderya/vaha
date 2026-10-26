@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,43 +6,21 @@ plugins {
 
 android {
     namespace = "com.kampplus.hava"
-    // compileSdk: derlemede erisilebilen Android API seviyesi.
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.kampplus.hava"
-        // minSdk: uygulamanin calisacagi en dusuk Android surumu.
         minSdk = 26
-        // targetSdk: davranislarin hangi surume gore ayarlanacagi.
-        targetSdk = 36
-        // versionCode sayisal surum kodu, versionName kullaniciya gosterilen surum.
-        versionCode = 2
-        versionName = "1.0.0"
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Imza bilgileri repoya girmez: keystore.properties (bkz. keystore.properties.example).
-    // Dosya yoksa release build debug anahtariyla imzalanir; kampta telefona kurmak icin
-    // yeterlidir, magazaya yuklemek icin gercek keystore zorunludur.
-    val keystoreFile = rootProject.file("keystore.properties")
-    val releaseSigning = if (keystoreFile.exists()) {
-        val keystore = Properties().apply { keystoreFile.inputStream().use(::load) }
-        signingConfigs.create("release") {
-            storeFile = rootProject.file(keystore.getProperty("storeFile"))
-            storePassword = keystore.getProperty("storePassword")
-            keyAlias = keystore.getProperty("keyAlias")
-            keyPassword = keystore.getProperty("keyPassword")
-        }
-    } else {
-        signingConfigs.getByName("debug")
-    }
-
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            signingConfig = releaseSigning
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -55,24 +31,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     buildFeatures {
         compose = true
-    }
-
-    testOptions {
-        unitTests {
-            // JVM testlerinde Android framework sınıfları (ör. android.util.Log) gerçekte
-            // yoktur. Varsayılan olarak her çağrı exception fırlatır; bu da ViewModel'in
-            // catch bloğundaki Log.e satırının testi düşürmesine yol açar.
-            // Bu ayar, framework çağrılarının hata yerine varsayılan değer dönmesini sağlar.
-            isReturnDefaultValues = true
-        }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -90,16 +53,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.okhttp.mockwebserver)
+    implementation(libs.androidx.datastore.preferences)
 
-    // @Preview'lari Android Studio'da gosterebilmek icin yalnizca debug derlemesinde.
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

@@ -13,20 +13,14 @@ import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.city.CityRoute
 import com.kampplus.hava.ui.forecast.ForecastRoute
 import com.kampplus.hava.ui.forecast.ForecastViewModel
+import com.kampplus.hava.ui.theme.AppThemeStyle
 
-/**
- * Uygulamanın iki ekranı ve aralarındaki geçiş.
- *
- * Navigation Compose, her ekranı bir "rota" (metin adresi) ile tanımlar. Bir şehre
- * dokunulduğunda adresi üretip [NavHostController.navigate] ile o adrese gideriz;
- * geri tuşu yığından bir önceki ekrana döner.
- *
- * Parametreleri yol parçası (`forecast/{name}`) yerine sorgu parametresi olarak
- * taşıyoruz (`forecast?name=...`); çünkü değerler boş olabilir ve boş bir yol
- * parçası rotayı eşleşmez hâle getirir.
- */
 @Composable
-fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()) {
+fun HavaNavHost(
+    onThemeChange: (AppThemeStyle) -> Unit,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+) {
     NavHost(
         navController = navController,
         startDestination = CITY_ROUTE,
@@ -34,13 +28,13 @@ fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController 
     ) {
         composable(CITY_ROUTE) {
             CityRoute(
-                onCityClick = { city -> navController.navigate(forecastRoute(city)) }
+                onCityClick = { city -> navController.navigate(forecastRoute(city)) },
+                onThemeChange = onThemeChange
             )
         }
         composable(
             route = FORECAST_ROUTE,
             arguments = listOf(
-                // Hepsi String: koordinatlar ViewModel içinde Double'a çevrilir.
                 navArgument(ForecastViewModel.ARG_NAME) {
                     type = NavType.StringType
                     defaultValue = ""
@@ -64,19 +58,11 @@ fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController 
     }
 }
 
-/** Liste ekranının adresi. */
 private const val CITY_ROUTE = "city"
 
-/** Tahmin ekranının adres şablonu; süslü parantezler çalışma anında doldurulur. */
 private const val FORECAST_ROUTE =
     "forecast?name={name}&subtitle={subtitle}&latitude={latitude}&longitude={longitude}"
 
-/**
- * Bir şehir için tahmin ekranının gerçek adresini üretir.
- *
- * `Uri.encode`: şehir adındaki boşluk ve Türkçe karakterler adreste sorun
- * çıkarmasın diye kaçışlanır ("Afyonkarahisar, Türkiye" → "Afyonkarahisar%2C%20T%C3%BCrkiye").
- */
 private fun forecastRoute(city: City): String = buildString {
     append("forecast")
     append("?name=").append(Uri.encode(city.name))

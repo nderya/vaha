@@ -2,24 +2,28 @@ package com.kampplus.hava.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/**
- * Uygulamanın renk paleti. MaterialTheme sayesinde renkler tek yerden yönetilir.
- *
- * Renkler burada **isimlendirilir**, [Theme] dosyasında açık/koyu temaya dağıtılır.
- * Bileşenler hiçbir zaman buradaki sabitleri doğrudan kullanmaz; `MaterialTheme.colorScheme`
- * üzerinden okur. Böylece tek satır değişince bütün uygulama yeni kıyafetini giyer.
- *
- * İsimlerdeki sayı tonu belirtir: 10 en koyu, 99 en açık.
- */
+// Default Material Teal
 internal val Teal10 = Color(0xFF002022)
 internal val Teal20 = Color(0xFF00373A)
-internal val Teal30 = Color(0xFF004F53)
 internal val Teal40 = Color(0xFF00696E)
 internal val Teal80 = Color(0xFF4CD9E0)
 internal val Teal90 = Color(0xFF6FF6FD)
-internal val Amber40 = Color(0xFF8B5000)
-internal val Amber80 = Color(0xFFFFB86E)
-internal val Amber90 = Color(0xFFFFDCBE)
+
+// Ocean Blue Theme
+internal val OceanPrimary = Color(0xFF0061A4)
+internal val OceanContainer = Color(0xFFD1E4FF)
+internal val OceanOnContainer = Color(0xFF001D36)
+
+// Sunset Purple Theme
+internal val SunsetPrimary = Color(0xFF8B418F)
+internal val SunsetContainer = Color(0xFFFFD6F8)
+internal val SunsetOnContainer = Color(0xFF36003B)
+
+// Amoled Black Theme
+internal val AmoledPrimary = Color(0xFFE2E2E2)
+internal val AmoledBackground = Color(0xFF000000)
+internal val AmoledSurface = Color(0xFF121212)
+
 internal val Neutral10 = Color(0xFF191C1C)
 internal val Neutral90 = Color(0xFFE0E3E3)
 internal val Neutral95 = Color(0xFFEFF1F1)

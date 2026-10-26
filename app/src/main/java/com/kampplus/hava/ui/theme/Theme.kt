@@ -6,52 +6,79 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-/**
- * Açık tema paleti. Her Material rolü ([Color.kt]'deki) bir renge bağlanır:
- * `primary` ana vurgu, `surface` kart zemini, `onSurface` o zemindeki yazı rengidir.
- */
+enum class AppThemeStyle(val displayName: String) {
+    SYSTEM("Sistem / Varsayılan"),
+    OCEAN("Okyanus Mavisi"),
+    SUNSET("Gün Batımı Moru"),
+    DARK_AMOLED("Amoled Gece")
+}
+
 private val LightColors = lightColorScheme(
     primary = Teal40,
     onPrimary = Neutral99,
     primaryContainer = Teal90,
     onPrimaryContainer = Teal10,
-    secondary = Amber40,
-    secondaryContainer = Amber90,
     background = Neutral99,
     onBackground = Neutral10,
     surface = Neutral99,
     onSurface = Neutral10,
     surfaceVariant = NeutralVariant90,
     onSurfaceVariant = NeutralVariant30,
-    surfaceContainer = Neutral95,
     error = Red40
 )
 
-/** Koyu tema paleti. Aynı roller, koyu zemine uygun tonlarla. */
 private val DarkColors = darkColorScheme(
     primary = Teal80,
     onPrimary = Teal20,
-    primaryContainer = Teal30,
+    primaryContainer = Teal20,
     onPrimaryContainer = Teal90,
-    secondary = Amber80,
     background = Neutral10,
     onBackground = Neutral90,
     surface = Neutral10,
     onSurface = Neutral90,
+    surfaceVariant = NeutralVariant30,
     onSurfaceVariant = NeutralVariant90,
     error = Red80
 )
 
-/**
- * Uygulamanın teması. Bütün ekranlar bunun içine sarmalanır.
- *
- * @param darkTheme Varsayılan olarak telefonun sistem ayarını izler
- *   ([isSystemInDarkTheme]). @Preview'larda elle `true` verip koyu temayı deneyebilirsin.
- */
+private val OceanColors = lightColorScheme(
+    primary = OceanPrimary,
+    primaryContainer = OceanContainer,
+    onPrimaryContainer = OceanOnContainer,
+    background = Neutral99,
+    surface = Neutral99
+)
+
+private val SunsetColors = lightColorScheme(
+    primary = SunsetPrimary,
+    primaryContainer = SunsetContainer,
+    onPrimaryContainer = SunsetOnContainer,
+    background = Neutral99,
+    surface = Neutral99
+)
+
+private val AmoledColors = darkColorScheme(
+    primary = AmoledPrimary,
+    background = AmoledBackground,
+    surface = AmoledSurface,
+    surfaceVariant = AmoledSurface
+)
+
 @Composable
-fun HavaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun HavaTheme(
+    themeStyle: AppThemeStyle = AppThemeStyle.SYSTEM,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors = when (themeStyle) {
+        AppThemeStyle.SYSTEM -> if (darkTheme) DarkColors else LightColors
+        AppThemeStyle.OCEAN -> OceanColors
+        AppThemeStyle.SUNSET -> SunsetColors
+        AppThemeStyle.DARK_AMOLED -> AmoledColors
+    }
+
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = colors,
         typography = HavaTypography,
         content = content
     )

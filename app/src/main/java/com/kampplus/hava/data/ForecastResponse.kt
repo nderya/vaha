@@ -8,22 +8,6 @@ import com.kampplus.hava.model.HourlyForecast
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-/**
- * Open-Meteo `/v1/forecast` yanıtının ham hali.
- *
- * Neden ayrı bir model? Şehir aramasında JSON doğrudan ekranda kullandığımız biçimdeydi
- * (bkz. [com.kampplus.hava.model.City]). Tahminde değil: servis veriyi **sütun** biçiminde
- * gönderir. Yani "her saat için bir nesne" yerine, her alan ayrı bir listedir:
- *
- * ```
- * "hourly": {
- *   "time":           ["2026-01-15T00:00", "2026-01-15T01:00", ...],
- *   "temperature_2m": [12.4,               11.8,               ...]
- * }
- * ```
- *
- * Aynı index aynı saate aittir. [toForecast] bu sütunları satırlara çevirir.
- */
 data class ForecastResponse(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
@@ -65,26 +49,27 @@ data class DailyResponse(
     @SerializedName("temperature_2m_min")
     val temperatureMin: List<Double?>? = null,
     @SerializedName("precipitation_probability_max")
-    val precipitationProbabilityMax: List<Int?>? = null
+    val precipitationProbabilityMax: List<Int?>? = null,
+    val sunrise: List<String>? = null,
+    val sunset: List<String>? = null
 )
 
-/**
- * Ağ modelini ekranın kullandığı [Forecast] modeline çevirir.
- *
- * `current` bloğu istenmiş ama gelmemişse yanıt bozuktur; hata fırlatırız ve
- * ViewModel bunu "Error" durumuna çevirir.
- */
 fun ForecastResponse.toForecast(): Forecast {
     val currentResponse = current
         ?: throw IllegalStateException("Forecast response has no current block")
+
+    val todaySunrise = daily?.sunrise?.firstOrNull()?.let { LocalDateTime.parse(it) }
+    val todaySunset = daily?.sunset?.firstOrNull()?.let { LocalDateTime.parse(it) }
+
     return Forecast(
         current = currentResponse.toCurrentWeather(),
         hourly = hourly.toHourlyForecasts(),
-        daily = daily.toDailyForecasts()
+        daily = daily.toDailyForecasts(),
+        sunriseTime = todaySunrise,
+        sunsetTime = todaySunset
     )
 }
 
-/** `timezone=auto` ile zamanlar ofsetsiz ISO formatında gelir: "2026-01-15T14:00". */
 private fun CurrentResponse.toCurrentWeather() = CurrentWeather(
     temperatureC = temperature,
     weatherCode = weatherCode,
@@ -94,13 +79,6 @@ private fun CurrentResponse.toCurrentWeather() = CurrentWeather(
     windSpeedKmh = windSpeed
 )
 
-/**
- * Sütun → satır çevrimi. Zaman listesinin her index'i için diğer listelerden
- * aynı index'teki değerler okunur.
- *
- * `mapNotNull` + `return@mapNotNull null`: bir satırın zorunlu alanı eksikse o satır
- * atlanır. Böylece tek bir bozuk kayıt yüzünden bütün ekran çökmez.
- */
 private fun HourlyResponse?.toHourlyForecasts(): List<HourlyForecast> {
     val times = this?.time ?: return emptyList()
     return times.indices.mapNotNull { index ->
@@ -115,7 +93,6 @@ private fun HourlyResponse?.toHourlyForecasts(): List<HourlyForecast> {
     }
 }
 
-/** Günlük veri de sütun biçimindedir; tek farkı zamanın saat değil tarih olması. */
 private fun DailyResponse?.toDailyForecasts(): List<DailyForecast> {
     val times = this?.time ?: return emptyList()
     return times.indices.mapNotNull { index ->
